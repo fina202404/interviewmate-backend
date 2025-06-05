@@ -1,0 +1,611 @@
+{
+	"info": {
+		"_postman_id": "2771c0e6-be00-428f-98b4-9d446c089057",
+		"name": "InterviewMate",
+		"description": "Postman collection generated from server.js and route files.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44341208",
+		"_collection_link": "https://202404.postman.co/workspace/202404's-Workspace~a20f10ba-3313-4de2-895f-b70209f5e224/collection/44341208-2771c0e6-be00-428f-98b4-9d446c089057?action=share&source=collection_link&creator=44341208"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/auth/signup",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						},
+						"description": "Register a new user."
+					},
+					"response": []
+				},
+				{
+					"name": "Sign In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"if (jsonData && jsonData.token) {\r",
+									"    pm.environment.set(\"authToken\", jsonData.token);\r",
+									"    console.log(\"authToken has been set in the environment.\");\r",
+									"} else {\r",
+									"    console.log(\"Token not found in response.\");\r",
+									"}\r",
+									"\r",
+									"\r",
+									"if (jsonData && jsonData.user && jsonData.user._id) {\r",
+									"    pm.environment.set(\"userId\", jsonData.user._id);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "jwt",
+							"jwt": [
+								{
+									"key": "algorithm",
+									"value": "HS256",
+									"type": "string"
+								},
+								{
+									"key": "isSecretBase64Encoded",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "payload",
+									"value": "{}",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "Bearer",
+									"type": "string"
+								},
+								{
+									"key": "queryParamKey",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "header",
+									"value": "{}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \n    \"Username\":\"testing\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"Confirm Password\":\"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/auth/signin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"signin"
+							]
+						},
+						"description": "Authenticate user and get token. You can add a test script to save the token to an environment variable:\n\nconst jsonData = pm.response.json();\npm.environment.set(\"authToken\", jsonData.token);"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Logged In User (Me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"description": "Auth token obtained from sign-in"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/api/auth/me",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get current logged in user's details. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/auth/forgotpassword",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"forgotpassword"
+							]
+						},
+						"description": "Initiate password reset process."
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"newStrongPassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/auth/resetpassword/{{resetToken}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"resetpassword",
+								"{{resetToken}}"
+							],
+							"variable": [
+								{
+									"key": "resetToken",
+									"value": "YOUR_RESET_TOKEN",
+									"description": "The reset token received (e.g., via email link)"
+								}
+							]
+						},
+						"description": "Reset user password using a token."
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication related endpoints"
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"description": "Auth token obtained from sign-in"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/api/users/profile",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"profile"
+							]
+						},
+						"description": "Get the profile of the currently authenticated user."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"description": "Auth token obtained from sign-in"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"newusername\",\n    \"email\": \"newemail@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/users/profile",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"profile"
+							]
+						},
+						"description": "Update the profile of the currently authenticated user."
+					},
+					"response": []
+				}
+			],
+			"description": "User profile management"
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAuthToken}}",
+								"description": "Admin auth token"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/api/admin/users",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users"
+							]
+						},
+						"description": "Retrieve a list of all users."
+					},
+					"response": []
+				},
+				{
+					"name": "Create User (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAuthToken}}",
+								"description": "Admin auth token"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"anotheruser\",\n    \"email\": \"another@example.com\",\n    \"password\": \"securepassword\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/admin/users",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users"
+							]
+						},
+						"description": "Admin creates a new user."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAuthToken}}",
+								"description": "Admin auth token"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/api/admin/users/{{userId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"{{userId}}"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "USER_ID_HERE",
+									"description": "ID of the user to retrieve"
+								}
+							]
+						},
+						"description": "Retrieve a specific user by their ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAuthToken}}",
+								"description": "Admin auth token"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"updatedusername\",\n    \"email\": \"updatedemail@example.com\",\n    \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/admin/users/{{userId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"{{userId}}"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "USER_ID_HERE",
+									"description": "ID of the user to update"
+								}
+							]
+						},
+						"description": "Admin updates a user's details."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAuthToken}}",
+								"description": "Admin auth token"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/api/admin/users/{{userId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"{{userId}}"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "USER_ID_HERE",
+									"description": "ID of the user to delete"
+								}
+							]
+						},
+						"description": "Admin deletes a user."
+					},
+					"response": []
+				}
+			],
+			"description": "Admin-only user management endpoints. All requests here require an admin auth token."
+		},
+		{
+			"name": "Questions",
+			"item": [
+				{
+					"name": "Get Interview Questions",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"jobTitle\": \"Software Engineer\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/get-questions",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"get-questions"
+							]
+						},
+						"description": "Generate interview questions based on a job title."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for getting interview questions"
+		},
+		{
+			"name": "Analyze",
+			"item": [
+				{
+					"name": "Analyze Response",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"question\": \"Tell me about a time you faced a challenge.\",\n    \"answer\": \"I once had to refactor a large legacy codebase under a tight deadline...\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/analyze",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"analyze"
+							]
+						},
+						"description": "Analyze a user's answer to a question."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for AI analysis"
+		},
+		{
+			"name": "Resume",
+			"item": [
+				{
+					"name": "Analyze Resume",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"description": "Auth token obtained from sign-in"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "resume",
+									"description": "PDF file of the resume",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/resume/analyze",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"resume",
+								"analyze"
+							]
+						},
+						"description": "Upload and analyze a resume. Requires authentication. Ensure to select a PDF file for the 'resume' field in the Body -> form-data tab in Postman."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for resume processing"
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:5001",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminAuthToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "resetToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
