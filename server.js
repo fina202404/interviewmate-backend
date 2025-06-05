@@ -18,7 +18,7 @@ app.use(express.json());
 
 // Enable CORS - Cross-Origin Resource Sharing
 app.use(cors({
-  origin: 'http://localhost:3000', // Your frontend URL
+  origin: 'https://gray-plant-022a2af00.6.azurestaticapps.net', // Your frontend URL
   // credentials: true // Only if you specifically need cookies/auth headers from a different subdomain to be sent
 }));
 
